@@ -1,18 +1,29 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import VisuallyHidden from '../VisuallyHidden';
+
 import { COLORS } from '../../constants';
 import Icon from '../Icon';
 import { getDisplayedValue } from './Select.helpers';
 
 const Select = ({ label, value, onChange, children }) => {
+	const [textWidth, setTextWidth] = React.useState();
 	const displayedValue = getDisplayedValue(value, children);
 
+	React.useEffect(() => {
+		const test = document.getElementById('text-width');
+		test.style.fontFamily = 'Roboto';
+		test.style.fontSize = 16;
+		test.innerText = displayedValue;
+
+		setTextWidth(test.clientWidth + 70 + 'px');
+	}, [displayedValue]);
+
 	const styles = {
-		width: [...displayedValue].length + 'em',
+		width: textWidth,
 	};
 
-	console.log(styles);
 	return (
 		<Wrapper style={styles}>
 			<SelectBox value={value} onChange={onChange} style={styles}>
@@ -21,6 +32,8 @@ const Select = ({ label, value, onChange, children }) => {
 			<IconWrapper>
 				<Icon id="chevron-down" size={24} />
 			</IconWrapper>
+			<TextWidth id="text-width"></TextWidth>
+			<VisuallyHidden>Select to sort. {children}</VisuallyHidden>
 		</Wrapper>
 	);
 };
@@ -31,22 +44,33 @@ const Wrapper = styled.div`
 
 const SelectBox = styled.select`
 	appearance: none;
-	width: var(--current-width);
 	font-size: 16px;
 	padding: 12px 52px 12px 16px;
 	background-color: ${COLORS.transparentGray15};
 	border: none;
 	border-radius: 8px;
-	color: ;
+	color: ${COLORS.gray700};
 	cursor: pointer;
+
+	&:hover {
+		color: ${COLORS.black};
+	}
 `;
 
 const IconWrapper = styled.div`
-	z-index: -1;
+	pointer-events: none;
 	position: absolute;
 	right: 10px;
 	top: 10px;
 	cursor: pointer;
+`;
+
+const TextWidth = styled.div`
+	position: absolute;
+	visibility: hidden;
+	height: auto;
+	width: auto;
+	white-space: nowrap;
 `;
 
 export default Select;
